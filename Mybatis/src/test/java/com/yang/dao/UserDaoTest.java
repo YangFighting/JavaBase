@@ -4,8 +4,11 @@ import com.yang.utils.MybatisUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.log4j.Logger;
 import org.junit.Test;
+import sun.rmi.runtime.NewThreadAction;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zhangyang
@@ -28,5 +31,20 @@ public class UserDaoTest {
         }
         // 关闭 sqlSession
         sqlSession.close();
+    }
+
+    @Test
+    public void getUserListByLimitTest(){
+        SqlSession sqlSession = MybatisUtils.getSqlSession();
+
+        UserDao mapper = sqlSession.getMapper(UserDao.class);
+        Map<String ,Integer> mapLimit = new HashMap<>();
+        mapLimit.put("startIndex", 1);
+        mapLimit.put("pageSize", 1);
+        List<User> userListByLimit = mapper.getUserListByLimit(mapLimit);
+        for (User user :
+                userListByLimit) {
+            Logger.warn(user);
+        }
     }
 }

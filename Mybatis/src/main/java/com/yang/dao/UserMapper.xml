@@ -7,4 +7,11 @@
     <select id="getUserList" resultType="com.yang.pojo.User">
         select * from user;
     </select>
+
+    <!-- 分页-->
+
+    <select id="getUserListByLimit" parameterType="map" resultType="com.yang.pojo.User">
+        select * from user limit #{startIndex},#{pageSize};
+    </select>
+
 </mapper>
