@@ -46,5 +46,6 @@ public class UserDaoTest {
                 userListByLimit) {
             Logger.warn(user);
         }
+        sqlSession.close();
     }
 }
