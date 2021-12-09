@@ -1,4 +1,5 @@
 package com.yang.dao;
+
 import com.yang.pojo.User;
 import com.yang.utils.MybatisUtils;
 import org.apache.ibatis.session.SqlSession;
@@ -34,16 +35,28 @@ public class UserDaoTest {
     }
 
     @Test
-    public void getUserListByLimitTest(){
+    public void getUserListByLimitTest() {
         SqlSession sqlSession = MybatisUtils.getSqlSession();
 
         UserDao mapper = sqlSession.getMapper(UserDao.class);
-        Map<String ,Integer> mapLimit = new HashMap<>();
+        Map<String, Integer> mapLimit = new HashMap<>();
         mapLimit.put("startIndex", 1);
         mapLimit.put("pageSize", 1);
         List<User> userListByLimit = mapper.getUserListByLimit(mapLimit);
         for (User user :
                 userListByLimit) {
+            Logger.warn(user);
+        }
+        sqlSession.close();
+    }
+
+    @Test
+    public void selectUserListTest() {
+        SqlSession sqlSession = MybatisUtils.getSqlSession();
+        UserDao mapper = sqlSession.getMapper(UserDao.class);
+        List<User> users = mapper.selectUserList();
+        for (User user :
+                users) {
             Logger.warn(user);
         }
         sqlSession.close();
