@@ -53,7 +53,9 @@
         </association>
     </resultMap>
     <select id="teacherList" resultType="com.yang.pojo.Teacher">
-        <!-- select后 必须 *, 否则查不到？？？-->
+        <!-- select后 必须 *, 否则查不到？？？
+            这里的 resultType 是 Teacher类，如果 使用sql的别名就要用 resultMap
+        -->
         select
             *
         from teacher as t
