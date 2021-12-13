@@ -28,14 +28,17 @@
     <!-- 子查询-->
     <select id="getTeacherListSubquery" resultMap="detailedTeacher1vNSubqueryResultMap">
         select
-            *
+            t.name as t_name,
+            t.id as t_id
         from teacher as t
     </select>
     <resultMap id="detailedTeacher1vNSubqueryResultMap" type="com.yang.pojo.Teacher1vN">
-        <!-- 这里的 column="id" 换成 tid 就会查不到结果 ？？？
+        <result property="id" column="t_id"/>
+        <result property="name" column="t_name"/>
+        <!-- 如果 getTeacherListSubquery 使用 select * , 这里的 column="id" 换成 tid 就会查不到结果 ？？？
             column应该表示 teacher中的数据库字段名称，用于 where s.id = #{tid} 的输入
         -->
-        <collection property="students" ofType="com.yang.pojo.Student1vN" javaType="ArrayList" select="getStudentList" column="id">
+        <collection property="students" ofType="com.yang.pojo.Student1vN" javaType="ArrayList" select="getStudentList" column="t_id">
 
         </collection>
     </resultMap>
