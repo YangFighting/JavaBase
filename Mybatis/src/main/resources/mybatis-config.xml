@@ -7,7 +7,8 @@
 
     </properties>
     <settings>
-        <setting name="logImpl" value="LOG4J"/>
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
     </settings>
     <!-- 引入外部文件-->
 
@@ -26,5 +27,9 @@
     <!-- 每个 Mapper.xml 都需要 在 Mybatis 核心配置文件中注册-->
     <mappers>
         <mapper resource="com/yang/dao/UserMapper.xml"/>
+        <mapper resource="com/yang/dao/StudentMapper.xml"/>
+        <mapper resource="com/yang/dao/TeacherMapper.xml"/>
+        <mapper resource="com/yang/dao/BlogMapper.xml"/>
     </mappers>
+
 </configuration>
