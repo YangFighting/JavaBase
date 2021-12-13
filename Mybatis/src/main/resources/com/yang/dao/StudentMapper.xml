@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace 空间会绑定一个 Mapper 接口-->
+<mapper namespace="com.yang.dao.StudentMapper">
+    <!-- 根据结果 映射关联表-->
+    <resultMap id="detailedStudentResultMap" type="com.yang.pojo.Student">
+        <!-- 关联查询表的字段， property 表示类属性， column表示数据库字段名-->
+        <result property="id" column="s_id"/>
+        <result property="name" column="s_name"/>
+        <!-- 关联子查询表字段-->
+        <association property="teacher" javaType="com.yang.pojo.Teacher">
+            <result property="id" column="t_id"/>
+            <result property="name" column="t_name"/>
+        </association>
+    </resultMap>
+    <!--使用关联查询sql-->
+    <select id="getStudentList" resultMap="detailedStudentResultMap">
+        select
+            s.id as s_id,
+            s.name as s_name,
+            s.tid as t_id,
+            t.name as t_name
+        from student as s
+            inner join teacher as t on s.tid = t.id
+        <where>
+            <if test="id != null">
+                AND s.id = #{id}
+            </if>
+        </where>
+        ;
+    </select>
+
+    <!-- 使用子查询的方式
+        1. 查询学生表
+        2. 根据学生表的 t_id 查相应的老师
+     -->
+
+    <select id="getStudentListSubquery" resultMap="detailedStudentSubqueryResultMap">
+        select
+            s.id as s_id,
+            s.name as s_name,
+            s.tid as s_tid
+        from student as s
+    </select>
+    <resultMap id="detailedStudentSubqueryResultMap" type="com.yang.pojo.Student">
+        <result property="id" column="s_id"/>
+        <result property="name" column="s_name"/>
+        <!-- property 表示学生的类属性 javaType 对应 子查询的对象-->
+        <association property="teacher" column="s_tid" javaType="com.yang.pojo.Teacher" select="teacherList">
+
+        </association>
+    </resultMap>
+    <select id="teacherList" resultType="com.yang.pojo.Teacher">
+        <!-- select后 必须 *, 否则查不到？？？-->
+        select
+            *
+        from teacher as t
+        where
+            t.id = #{id}
+    </select>
+
+    <!-- 组合查询 关联查询的另外一种形式-->
+    <select id="getStudentListCombinationQuery" resultMap="detailedStudentCombinationQueryResultMap">
+        select
+            s.id as s_id,
+            s.name as s_name,
+            t.name as t_name,
+            t.id as t_id
+        from student as s, teacher as t
+        where
+            s.tid = t.id
+    </select>
+    <resultMap id="detailedStudentCombinationQueryResultMap" type="com.yang.pojo.Student">
+        <result property="id" column="s_id"/>
+        <result property="name" column="s_name"/>
+        <association property="teacher" javaType="com.yang.pojo.Teacher">
+            <result property="id" column="t_id"/>
+            <result property="name" column="t_name"/>
+        </association>
+    </resultMap>
+
+
+</mapper>
