@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace 空间会绑定一个 Mapper 接口-->
+<mapper namespace="com.yang.dao.Teacher1vNMapper">
+    <!-- 组合查询 -->
+    <select id="getTeacherList" resultMap="detailedTeacher1vNResultMap">
+        select
+            s.id as s_id,
+            s.name as s_name,
+            t.name as t_name,
+            t.id as t_id
+        from student as s, teacher as t
+        where
+            s.tid = t.id
+    </select>
+    <resultMap id="detailedTeacher1vNResultMap" type="com.yang.pojo.Teacher1vN">
+        <result property="id" column="t_id"/>
+        <result property="name" column="t_name"/>
+        <collection property="students" ofType="com.yang.pojo.Student1vN">
+            <result property="id" column="s_id"/>
+            <result property="name" column="s_name"/>
+            <result property="tid" column="t_id"/>
+        </collection>
+    </resultMap>
+
+    <!-- 子查询-->
+    <select id="getTeacherListSubquery" resultMap="detailedTeacher1vNSubqueryResultMap">
+        select
+            *
+        from teacher as t
+    </select>
+    <resultMap id="detailedTeacher1vNSubqueryResultMap" type="com.yang.pojo.Teacher1vN">
+        <!-- 这里的 column="id" 换成 tid 就会查不到结果 ？？？
+            column应该表示 teacher中的数据库字段名称，用于 where s.id = #{tid} 的输入
+        -->
+        <collection property="students" ofType="com.yang.pojo.Student1vN" javaType="ArrayList" select="getStudentList" column="id">
+
+        </collection>
+    </resultMap>
+    <select id="getStudentList" resultType="com.yang.pojo.Student1vN">
+        select
+            *
+        from student as s
+        where s.id = #{tid}
+    </select>
+
+</mapper>
