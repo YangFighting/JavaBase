@@ -12,6 +12,7 @@
         <module>JDBC</module>
         <module>InOut</module>
         <module>Mybatis</module>
+        <module>Proxy</module>
     </modules>
 
     <properties>
