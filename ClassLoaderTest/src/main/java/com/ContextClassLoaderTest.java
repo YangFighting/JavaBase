@@ -22,8 +22,12 @@ public class ContextClassLoaderTest {
         System.out.println("Thread "+Thread.currentThread().getName()+" classloader: "
                 +Thread.currentThread().getContextClassLoader().toString());
         new Thread(new Runnable() {
+
             @Override
             public void run() {
+                // 设置子线程的ContextClassLoader
+                Thread.currentThread().setContextClassLoader(diskLoader1);
+
                 System.out.println("Thread "+Thread.currentThread().getName()+" classloader: "+
                         Thread.currentThread().getContextClassLoader().toString());
                 ClassLoader cl = Thread.currentThread().getContextClassLoader();
