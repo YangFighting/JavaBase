@@ -16,14 +16,13 @@ import java.util.Set;
 public class MultiplexerTimeServer implements Runnable {
 
     private Selector selector;
-    private ServerSocketChannel servChannel;
 
     private volatile boolean stop;
 
     public MultiplexerTimeServer(int port) {
         try {
             selector = Selector.open();
-            servChannel = ServerSocketChannel.open();
+            ServerSocketChannel servChannel = ServerSocketChannel.open();
 
             servChannel.configureBlocking(false);
             servChannel.socket().bind(new InetSocketAddress(port), 1024);
@@ -33,6 +32,10 @@ public class MultiplexerTimeServer implements Runnable {
         }
     }
 
+    public void stop() {
+        this.stop = true;
+    }
+
     @Override
     public void run() {
         while (!stop) {
@@ -40,14 +43,15 @@ public class MultiplexerTimeServer implements Runnable {
                 selector.select(1000);
                 Set<SelectionKey> selectionKeys = selector.selectedKeys();
                 Iterator<SelectionKey> it = selectionKeys.iterator();
+                SelectionKey key;
                 while (it.hasNext()) {
-                    SelectionKey key = it.next();
+                    key = it.next();
                     it.remove();
 
                     try {
                         handleInput(key);
 
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         if (key != null) {
                             key.cancel();
                             if (key.channel() != null)
@@ -55,9 +59,8 @@ public class MultiplexerTimeServer implements Runnable {
                         }
                         e.printStackTrace();
                     }
-
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -86,25 +89,33 @@ public class MultiplexerTimeServer implements Runnable {
 
                 SocketChannel sc = (SocketChannel) key.channel();
                 ByteBuffer readBuffer = ByteBuffer.allocate(1024);
-                int readBytes = sc.read(readBuffer);
-                if (readBytes > 0) {
-                    readBuffer.flip();
-                    byte[] bytes = new byte[readBuffer.remaining()];
-                    readBuffer.get(bytes);
-                    String body = new String(bytes, StandardCharsets.UTF_8);
-                    System.out.println("The time server receive order : "
-                            + body);
+                try {
+                    // 增加捕捉异常
+                    int readBytes = sc.read(readBuffer);
 
-                    String currentTime = "QUERY TIME ORDER"
-                            .equalsIgnoreCase(body) ? new java.util.Date(
-                            System.currentTimeMillis()).toString()
-                            : "BAD ORDER";
-                    doWrite(sc, currentTime);
+                    if (readBytes > 0) {
+                        readBuffer.flip();
+                        byte[] bytes = new byte[readBuffer.remaining()];
+                        readBuffer.get(bytes);
+                        String body = new String(bytes, StandardCharsets.UTF_8);
+                        System.out.println("The time server receive order : "
+                                + body);
 
-                } else if (readBytes < 0) {
+                        String currentTime = "QUERY TIME ORDER"
+                                .equalsIgnoreCase(body) ? new java.util.Date(
+                                System.currentTimeMillis()).toString()
+                                : "BAD ORDER";
+                        doWrite(sc, currentTime);
+
+                    } else if (readBytes < 0) {
+                        key.cancel();
+                        sc.close();
+                    }// 读到0字节，忽略
+                } catch (IOException e) {
                     key.cancel();
+                    sc.socket().close();
                     sc.close();
-                }// 读到0字节，忽略
+                }
 
 
             }

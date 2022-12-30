@@ -16,15 +16,15 @@ import java.util.Set;
  * @create 2022-12-29 19:57
  */
 public class TimeClientHandle implements Runnable {
-    private String host;
-    private int port;
+    private final String host;
+    private final int port;
 
     private Selector selector;
     private SocketChannel socketChannel;
     private volatile boolean stop;
 
     public TimeClientHandle(String host, int port) {
-        this.host = host;
+        this.host = host == null ? "127.0.0.1" : host;
         this.port = port;
 
         try {
@@ -65,13 +65,20 @@ public class TimeClientHandle implements Runnable {
                                 key.channel().close();
                         }
                     }
-
                 }
             } catch (IOException e) {
                 e.printStackTrace();
                 System.exit(1);
             }
         }
+
+        // 多路复用器关闭后，所有注册在上面的Channel和Pipe等资源都会被自动去注册并关闭，所以不需要重复释放资源
+        if (selector != null)
+            try {
+                selector.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
     }
 
     private void handleInput(SelectionKey key) throws IOException {
