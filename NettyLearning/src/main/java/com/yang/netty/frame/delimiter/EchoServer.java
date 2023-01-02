@@ -36,8 +36,8 @@ public class EchoServer {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
                             ByteBuf delimiter = Unpooled.copiedBuffer("$_".getBytes());
-//                            socketChannel.pipeline().addLast(new DelimiterBasedFrameDecoder(1024,
-//                                    delimiter));
+                            socketChannel.pipeline().addLast(new DelimiterBasedFrameDecoder(1024,
+                                    delimiter));
                             socketChannel.pipeline().addLast(new StringDecoder());
                             socketChannel.pipeline().addLast(new EchoServerHandler());
                         }
