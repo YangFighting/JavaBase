@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * @author zhangyang03
- * @Description 运行 proto 例程
+ * @Description 8.1.2  Protobuf 编码开发， 运行 proto 例程
  * @create 2023-01-04 20:12
  */
 public class TestSubscribeReqProto {
